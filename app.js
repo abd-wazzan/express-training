@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 const mongoose = require('mongoose');
-const Post = require('./models/post');
+const PostRoutes = require('./routes/posts');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
@@ -33,35 +33,6 @@ app.use((req, res, next) => {
     next();
 });
 
-app.post("/api/posts", (req, res, next) => {
-    const post = new Post({
-        title: req.body.title,
-        content: req.body.content
-    });
-    post.save().then((post) => {
-        res.status(200).json({
-            message: "success",
-            data: post
-        });
-    });
-});
-
-app.delete("/api/posts/:id", (req, res, next) => {
-    Post.deleteOne({_id: req.params.id}).then(() => {
-        res.status(200).json({
-            message: "success",
-        });
-    });
-});
-
-app.use('/api/posts', (req, res, next) => {
-    Post.find()
-        .then((posts) => {
-            res.status(200).json({
-                message: "success",
-                data: posts
-            });
-        });
-});
+app.use("/api/posts", PostRoutes);
 
 module.exports = app;
