@@ -3,9 +3,11 @@ const bodyParser = require('body-parser');
 const app = express();
 const mongoose = require('mongoose');
 const PostRoutes = require('./routes/posts');
+const path = require('path');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
+app.use("/storage/images", express.static(path.join("storage/images")));
 
 mongoose.connect("mongodb+srv://wazzan:QCdED79zcGERtG9q@cluster0.plvrf8z.mongodb.net/test?retryWrites=true&w=majority")
     .then(() => {
