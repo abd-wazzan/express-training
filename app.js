@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use("/storage/images", express.static(path.join("storage/images")));
 
-mongoose.connect("mongodb+srv://wazzan:QCdED79zcGERtG9q@cluster0.plvrf8z.mongodb.net/test?retryWrites=true&w=majority")
+mongoose.connect("mongodb+srv://wazzan:" + process.env.MONGO_ATLAS_PW + "@cluster0.plvrf8z.mongodb.net/test?retryWrites=true&w=majority")
     .then(() => {
         console.log("Connected")
     })
