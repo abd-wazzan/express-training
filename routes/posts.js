@@ -40,6 +40,10 @@ router.get("/:id", (req, res, next) => {
                 message: "not found",
             });
         }
+    }).catch(error => {
+        res.status(500).json({
+            message: "operation failed",
+        });
     });
 });
 
@@ -55,6 +59,10 @@ router.post("", checkAuth, multer({storage: storage}).single("image"), (req, res
         res.status(200).json({
             message: "success",
             data: post
+        });
+    }).catch(error => {
+        res.status(500).json({
+            message: "operation failed",
         });
     });
 });
@@ -82,6 +90,10 @@ router.put("/:id", checkAuth, multer({storage: storage}).single("image"),(req, r
                 message: "Not authorized!",
             });
         }
+    }).catch(error => {
+        res.status(500).json({
+            message: "operation failed",
+        });
     });
 });
 
@@ -96,6 +108,10 @@ router.delete("/:id", checkAuth, (req, res, next) => {
                 message: "Not authorized!",
             });
         }
+    }).catch(error => {
+        res.status(500).json({
+            message: "operation failed",
+        });
     });
 });
 
@@ -120,7 +136,11 @@ router.get("", (req, res, next) => {
                 data: fetchedPosts,
                 count: count
             });
+        }).catch(error => {
+        res.status(500).json({
+            message: "operation failed",
         });
+    });
 });
 
 module.exports = router;
