@@ -1,6 +1,7 @@
 const express = require("express");
 const Post = require("../models/post");
 const multer = require("multer");
+const checkAuth = require("../middleware/check-auth");
 
 const router = express.Router();
 const MIME_TYPE_MAP = {
@@ -42,9 +43,10 @@ router.get("/:id", (req, res, next) => {
     });
 });
 
-router.post("", multer({storage: storage}).single("image"), (req, res, next) => {
+router.post("", checkAuth, multer({storage: storage}).single("image"), (req, res, next) => {
     const url = req.protocol + '://' + req.get("host");
     const post = new Post({
+        creator: req.userData.userId,
         title: req.body.title,
         content: req.body.content,
         imagePath: url + "/storage/images/" + req.file.filename
@@ -57,7 +59,7 @@ router.post("", multer({storage: storage}).single("image"), (req, res, next) => 
     });
 });
 
-router.put("/:id", multer({storage: storage}).single("image"),(req, res, next) => {
+router.put("/:id", checkAuth, multer({storage: storage}).single("image"),(req, res, next) => {
     let imagePath = req.body.imagePath;
     if (req.file) {
         const url = req.protocol + '://' + req.get("host");
@@ -67,21 +69,33 @@ router.put("/:id", multer({storage: storage}).single("image"),(req, res, next) =
         _id: req.body.id,
         title: req.body.title,
         content: req.body.content,
-        imagePath: imagePath
+        imagePath: imagePath,
+        creator: req.userData.userId
     });
-    Post.updateOne({_id: req.params.id}, post).then((post) => {
-        res.status(200).json({
-            message: "success",
-            data: post
-        });
+    Post.updateOne({_id: req.params.id, creator: req.userData.userId}, post).then(result => {
+        if (result.modifiedCount > 0) {
+            res.status(200).json({
+                message: "success",
+            });
+        } else {
+            res.status(401).json({
+                message: "Not authorized!",
+            });
+        }
     });
 });
 
-router.delete("/:id", (req, res, next) => {
-    Post.deleteOne({_id: req.params.id}).then(() => {
-        res.status(200).json({
-            message: "success",
-        });
+router.delete("/:id", checkAuth, (req, res, next) => {
+    Post.deleteOne({_id: req.params.id, creator: req.userData.userId}).then(result => {
+        if (result.deletedCount > 0) {
+            res.status(200).json({
+                message: "success",
+            });
+        } else {
+            res.status(401).json({
+                message: "Not authorized!",
+            });
+        }
     });
 });
 
